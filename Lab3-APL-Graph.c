@@ -1,11 +1,17 @@
-#include <windows.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <semaphore.h>
 
 #define TRUE 1
 #define FALSE 0
 #define N 10
-#define debugtxt(FORMAT) printf("TID %d: " #FORMAT "\n",GetCurrentThreadId())
-#define debug(FORMAT, ARGS...) printf("TID %d: " #FORMAT "\n",GetCurrentThreadId(),ARGS)
+#define debugtxt(FORMAT) printf("TID %ld: " #FORMAT "\n",pthread_self())
+#define debug(FORMAT, ARGS...) printf("TID %ld: " #FORMAT "\n",pthread_self(),ARGS)
+//#define debugtxt(FORMAT) printf(" TID xxx: " #FORMAT "\n")
+//#define debug(FORMAT, ARGS...) printf("TID xxx: " #FORMAT "\n",ARGS)
 
 // Funcoes e variaveis do buffer
 int start;
@@ -30,27 +36,34 @@ int remove_item() {
 }
 
 // Funcoes e variaveis das threads
-HANDLE handleThread[2];
-DWORD threadId[2];
+//HANDLE handleThread[2];
+//DWORD threadId[2];
+//const int producer = 0;
+//const int consumer = 1;
+//HANDLE full;
+//HANDLE empty;
+//HANDLE mutex;
+
+pthread_t threadId[2];
 const int producer = 0;
 const int consumer = 1;
-HANDLE full;
-HANDLE empty;
-HANDLE mutex;
+sem_t mutex;
+sem_t full;
+sem_t empty;
 
 // Truque para sabermos qual o semaforo foi chamado e poder imprimi-lo
 #define up(SEM) _up(SEM,#SEM)
 #define down(SEM) _down(SEM,#SEM)
 
-void _up(HANDLE sem, const char * name) {
-	debug("Up %s ...",name);
-	ReleaseSemaphore(sem,1,NULL);
-	debug("Up %s complete!",name);
+void _up(sem_t *sem, const char * name) {
+	debug("Up %s ...",name+1);
+	sem_post(sem);
+	debug("Up %s complete!",name+1);
 }
-void _down(HANDLE sem, const char * name) {
-	debug("Down %s ...",name);
-	WaitForSingleObject(sem,INFINITE);
-	debug("Down %s complete!",name);
+void _down(sem_t *sem, const char * name) {
+	debug("Down %s ...",name+1);
+	sem_wait(sem);
+	debug("Down %s complete!",name+1);
 }
 
 // Produtor e consumidor ...
@@ -66,30 +79,38 @@ void consume_item(int item) {
 	debug("Consumed item %d",item);
 }
 
-DWORD WINAPI producerFunc( LPVOID lpParam ) {
+void* producerFunc() {
 	debugtxt("Starting producer");
 	int item;
 	while(TRUE) {
 		item=produce_item();
-		down(empty);
-		down(mutex);
+		down(&empty);
+		//sem_wait(&empty);
+		down(&mutex);
+		//sem_wait(&mutex);
 		insert_item(item);
-		up(mutex);
-		up(full);
+		up(&mutex);
+		//sem_post(&mutex);
+		up(&full);
+		//sem_post(&full);
 	}
 	debugtxt("Ending producer");
 	return 0;
 }
 
-DWORD WINAPI consumerFunc( LPVOID lpParam ) {
+void* consumerFunc() {
 	debugtxt("Starting consumer");
 	int item;
 	while(TRUE) {
-		down(full);
-		down(mutex);
+		down(&full);
+		//sem_wait(&full);
+		down(&mutex);
+		//sem_wait(&mutex);
 		item = remove_item();
-		up(mutex);
-		up(empty);
+		up(&mutex);
+		//sem_post(&mutex);
+		up(&empty);
+		//sem_post(&empty);
 		consume_item(item);
 	}
 	debugtxt("Ending consumer");
@@ -102,7 +123,10 @@ int main() {
 	last_produced_item = 0;
 	start = 0;
 	end = 0;
+	int err;
+	void* status;
 	// Criando semaforos ...
+	/*
 	full = CreateSemaphore( 
 			NULL,           // default security attributes
 			0,			// initial count
@@ -118,9 +142,13 @@ int main() {
 			1,			// initial count
 			1,  			// maximum count
 			NULL);
+	*/
+	sem_init(&mutex, 0, 1);
+	sem_init(&full, 0, 0);
+	sem_init(&empty,0, N);
 	
-	LPTHREAD_START_ROUTINE threadFunc[2] = { producerFunc, consumerFunc };
 	for(i=0;i<2;i++) {
+   		/*
 		handleThread[i] = CreateThread( 
             NULL,               // default security attributes
             0,                  // use default stack size  
@@ -128,15 +156,17 @@ int main() {
             &i,     			// argument to thread function 
             0,                  // use default creation flags 
             &threadId[i]);   // returns the thread identifier 
-	}
-	
-	WaitForMultipleObjects(2, handleThread, TRUE, INFINITE);
-	
-	for(i=0;i<2;i++) {
-		CloseHandle(handleThread[i]);
-	}
-	CloseHandle(empty);
-	CloseHandle(full);
-	CloseHandle(mutex);
+        */
+   		if(i == 0)
+   			err = pthread_create(&threadId[i], NULL, &producerFunc, NULL);
+   		else
+			err = pthread_create(&threadId[i], NULL, &consumerFunc, NULL);   			
+   }
+    pthread_join(threadId[0], &status);
+    pthread_join(threadId[1], &status);
+    sem_destroy(&mutex);
+    sem_destroy(&full);
+    sem_destroy(&empty);
+    pthread_exit(NULL);
 	
 }
