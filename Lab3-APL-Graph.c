@@ -8,6 +8,7 @@
 #define TRUE 1
 #define FALSE 0
 #define N 10
+#define N_VERT 1000
 #define debugtxt(FORMAT) printf("TID %ld: " #FORMAT "\n",pthread_self())
 #define debug(FORMAT, ARGS...) printf("TID %ld: " #FORMAT "\n",pthread_self(),ARGS)
 //#define debugtxt(FORMAT) printf(" TID xxx: " #FORMAT "\n")
@@ -67,8 +68,33 @@ void _down(sem_t *sem, const char * name) {
 }
 
 // Produtor e consumidor ...
-int produce_item() {
+int produce_item(int adj_matrix[N_VERT][N_VERT]) {
 	debugtxt("Producing item ...");
+	float z=1.2;
+	float q;
+	int j,k;
+	q=z/N_VERT;
+	debug("Produzindo grafo (n=%d , q=%g) ...",N_VERT,q);
+	//printf("j = %d, k = %d\n"j,k);
+	for (j=0;j<N_VERT;j++){
+		for (k=0;k<=j;k++){
+			//printf("j = %d, k = %d\n",j,k);
+			if(k==j){
+				//printf("j = %d, k = %d\n",j,k);
+    			adj_matrix[j][k]=0;
+    			//printf("j = %d, k = %d\n",j,k);
+    			adj_matrix[k][j]=0;
+   			} else {
+	   			if(((float)rand())/RAND_MAX<q){
+	    			adj_matrix[j][k]=1;
+	    			adj_matrix[k][j]=1;
+	    		} else {
+	    			adj_matrix[j][k]=0;
+	    			adj_matrix[k][j]=0;
+	    		}	
+   			}
+		}
+	}
 	last_produced_item++;
 	debug("Produced item %d",last_produced_item);
 	return last_produced_item;
@@ -82,8 +108,15 @@ void consume_item(int item) {
 void* producerFunc() {
 	debugtxt("Starting producer");
 	int item;
+	int **mat;
+	mat = malloc(N_VERT*sizeof(int));
+	int i,j;
+	for (i = 0; i < N_VERT; ++i)
+	{
+		mat[i] = malloc(N_VERT*sizeof(int));
+	}
 	while(TRUE) {
-		item=produce_item();
+		item=produce_item(mat);
 		down(&empty);
 		//sem_wait(&empty);
 		down(&mutex);
