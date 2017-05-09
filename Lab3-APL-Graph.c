@@ -24,6 +24,8 @@ int last_consumed_item;
 int ** removed_item;
 //Buffer para guardar os grafos ja construidos
 int ** graph_buffer[N];
+int degrees[N_VERT];
+float average_degree = 0;
 
 void insert_item(int item) {
 	debug("Inserting item %d",item);
@@ -65,6 +67,7 @@ const int consumer = 1;
 sem_t mutex;
 sem_t full;
 sem_t empty;
+sem_t mutex_AD;
 
 // Truque para sabermos qual o semaforo foi chamado e poder imprimi-lo
 #define up(SEM) _up(SEM,#SEM)
@@ -115,7 +118,26 @@ int produce_item(int **adj_matrix) {
 }
 void consume_item(int item) {
 	debugtxt("Consuming item ...");
+	debugtxt("Calculando o grau medio");
+	int i,j;
+	int auxsum, sum;
+	double temp;
+	for(i=0; i < N_VERT;i++){
+		auxsum=0;
+		for(j=0;j<N_VERT;j++){
+			if(removed_item[i][j]==1)
+				auxsum++;
+		}
+		sum = sum + auxsum;
+	}
+	temp = (float) sum/N_VERT;
+	//Na hora de modificar a variável global, deve-se travá-la
+	down(&mutex_AD);
+	average_degree = (average_degree*last_consumed_item + temp)/(last_consumed_item+1);
+	printf("O grau medio eh: %g\n", average_degree);
+	up(&mutex_AD);
 	last_consumed_item = item;
+
 	debug("Consumed item %d",item);
 }
 
@@ -199,6 +221,7 @@ int main() {
 			NULL);
 	*/
 	sem_init(&mutex, 0, 1);
+	sem_init(&mutex_AD, 0, 1);
 	sem_init(&full, 0, 0);
 	sem_init(&empty,0, N);
 	
