@@ -25,7 +25,8 @@ int ** removed_item;
 //Buffer para guardar os grafos ja construidos
 int ** graph_buffer[N];
 int degrees[N_VERT];
-float average_degree = 0;
+double average_degree = 0;
+double clustering_coefficient=0;
 
 void insert_item(int item) {
 	debug("Inserting item %d",item);
@@ -68,6 +69,7 @@ sem_t mutex;
 sem_t full;
 sem_t empty;
 sem_t mutex_AD;
+sem_t mutex_CC;
 
 // Truque para sabermos qual o semaforo foi chamado e poder imprimi-lo
 #define up(SEM) _up(SEM,#SEM)
@@ -120,7 +122,8 @@ void consume_item(int item) {
 	debugtxt("Consuming item ...");
 	debugtxt("Calculando o grau medio");
 	int i,j;
-	int auxsum, sum;
+	int sum=0;
+	int auxsum;
 	double temp;
 	for(i=0; i < N_VERT;i++){
 		auxsum=0;
@@ -130,12 +133,49 @@ void consume_item(int item) {
 		}
 		sum = sum + auxsum;
 	}
-	temp = (float) sum/N_VERT;
+	temp = (double) sum/N_VERT;
 	//Na hora de modificar a variável global, deve-se travá-la
 	down(&mutex_AD);
 	average_degree = (average_degree*last_consumed_item + temp)/(last_consumed_item+1);
 	printf("O grau medio eh: %g\n", average_degree);
 	up(&mutex_AD);
+
+	debugtxt("Calculando o clustering coefficient");
+	auxsum=0;
+	int viz[N_VERT];
+	int vizLen=0;
+	double CCSum = 0;
+	int m,n;
+	for(i=0; i < N_VERT;i++){
+		auxsum=0;
+		vizLen = 0;
+		for(j=0; j<N_VERT; j++){
+			if(removed_item[i][j] == 1){
+				viz[vizLen] = j;
+				//printf("j=%d\n",j);
+				vizLen++;
+			}			
+		}
+		for(m=0; m < vizLen-1; m++){
+			for(n = m+1; n<vizLen;n++){
+				if(removed_item[viz[m]][viz[n]]==1){
+					//printf("auxsum = %d\n", auxsum);
+					auxsum++;
+				}
+			}
+		}
+		if(vizLen != 0 && vizLen != 1)
+			CCSum = (double) auxsum/(vizLen*(vizLen-1)) + CCSum;
+
+		//printf("CCSum = %g\n", CCSum);
+		//printf("vizLen = %d\n", vizLen);
+		//printf("auxsum = %d\n", auxsum);
+	}
+	temp = (double) CCSum/N_VERT;
+	down(&mutex_CC);
+	clustering_coefficient = (clustering_coefficient*last_consumed_item + temp)/(last_consumed_item+1);
+	printf("O coeficiente de agrupamento eh: %g\n", clustering_coefficient);
+	up(&mutex_CC);
 	last_consumed_item = item;
 
 	debug("Consumed item %d",item);
@@ -222,6 +262,7 @@ int main() {
 	*/
 	sem_init(&mutex, 0, 1);
 	sem_init(&mutex_AD, 0, 1);
+	sem_init(&mutex_CC, 0, 1);
 	sem_init(&full, 0, 0);
 	sem_init(&empty,0, N);
 	
