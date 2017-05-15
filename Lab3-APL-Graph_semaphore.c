@@ -7,7 +7,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define N 5
+#define N 7
 #define N_VERT 2000
 #define N_CONS 3
 #define N_PROD 1
@@ -38,7 +38,7 @@ int cc_count, ad_count;
 void insert_item(int item) {
 	debug("Inserindo grafo no buffer #%d",item);
 	buffer[end]=item;
-	printf("end = %d\n", end);
+	//printf("end = %d\n", end);
 	end=(end+1)%N;
 	debugtxt("Grafo inserido!");
 }
@@ -73,14 +73,14 @@ sem_t mutex_CC;
 #define down(SEM) _down(SEM,#SEM)
 
 void _up(sem_t *sem, const char * name) {
-	debug("Up %s ...",name+1);
+	//debug("Up %s ...",name+1);
 	sem_post(sem);
-	debug("Up %s complete!",name+1);
+	//debug("Up %s complete!",name+1);
 }
 void _down(sem_t *sem, const char * name) {
-	debug("Down %s ...",name+1);
+	//debug("Down %s ...",name+1);
 	sem_wait(sem);
-	debug("Down %s complete!",name+1);
+	//debug("Down %s complete!",name+1);
 }
 
 // Produtor e consumidor ...
@@ -129,7 +129,7 @@ void consume_item(int item, int id) {
 	down(&mutex_AD);
 	average_degree = (average_degree*ad_count + temp)/(ad_count+1);
 	ad_count++;
-	printf("O grau medio eh: %g - %d iterações\n", average_degree,ad_count);
+	debug("O grau medio eh: %g - %d iterações\n", average_degree,ad_count);
 	up(&mutex_AD);
 
 	debugtxt("Calculando o clustering coefficient...");
@@ -163,7 +163,7 @@ void consume_item(int item, int id) {
 	down(&mutex_CC);
 	clustering_coefficient = (clustering_coefficient*cc_count + temp)/(cc_count+1);
 	cc_count++;
-	printf("O coeficiente de agrupamento eh: %g - %d iterações\n", clustering_coefficient,cc_count);
+	debug("O coeficiente de agrupamento eh: %g - %d iterações\n", clustering_coefficient,cc_count);
 	up(&mutex_CC);
 	last_consumed_item = item;
 	debug("Consumido o grafo #%d",item);
