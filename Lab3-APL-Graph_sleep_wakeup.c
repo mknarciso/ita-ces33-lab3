@@ -184,7 +184,7 @@ void consumerFunc() {
 	int cons_ID=0;
 	while(TRUE) {
 		if(count == 0) {
-			sleep(30/1000); //Descomentar:forca disputa
+			sleep(3); //Descomentar:forca disputa
 			sleepThread(consumer);
 		}
 		item = remove_item(cons_ID);
