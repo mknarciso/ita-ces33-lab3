@@ -4,13 +4,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <time.h>
 
 #define TRUE 1
 #define FALSE 0
-#define N 7
+#define N 1
 #define N_VERT 2000
-#define N_CONS 3
+#define N_CONS 1
 #define N_PROD 1
+#define LAST_GRAPH 300
 #define debugtxt(FORMAT) printf("TID %ld: " #FORMAT "\n",pthread_self())
 #define debug(FORMAT, ARGS...) printf("TID %ld: " #FORMAT "\n",pthread_self(),ARGS)
 
@@ -36,15 +38,15 @@ int cc_count, ad_count;
 
 // Atualiza o buffer dos índices
 void insert_item(int item) {
-	debug("Inserindo grafo no buffer #%d",item);
+	//debug("Inserindo grafo no buffer #%d",item);
 	buffer[end]=item;
 	//printf("end = %d\n", end);
 	end=(end+1)%N;
-	debugtxt("Grafo inserido!");
+	//debugtxt("Grafo inserido!");
 }
 
 int remove_item(int id) {
-	debugtxt("Removendo grafo do buffer para consumo.");
+	//debugtxt("Removendo grafo do buffer para consumo.");
 	int item = buffer[start];
 	int i,j;
 	//Copia a matrix a ser consumida
@@ -54,7 +56,7 @@ int remove_item(int id) {
 		}
 	}
 	start=(start+1)%N;
-	debug("Removido grafo #%d",item);
+	//debug("Removido grafo #%d",item);
 	return item;
 }
 
@@ -89,7 +91,7 @@ int produce_item(int **adj_matrix) {
 	float q;
 	int j,k;
 	q=z/N_VERT;
-	debug("Produzindo grafo (n=%d , q=%g) ...",N_VERT,q);
+	//debug("Produzindo grafo (n=%d , q=%g) ...",N_VERT,q);
 	for (j=0;j<N_VERT;j++){
 		for (k=0;k<=j;k++){
 			if(k==j){
@@ -107,11 +109,11 @@ int produce_item(int **adj_matrix) {
 		}
 	}
 	last_produced_item++;
-	debug("Grafo completo #%d",last_produced_item);
+	//debug("Grafo completo #%d",last_produced_item);
 	return last_produced_item;
 }
 void consume_item(int item, int id) {
-	debugtxt("Calculando o grau medio...");
+	//debugtxt("Calculando o grau medio...");
 	int i,j;
 	int sum=0;
 	int auxsum;
@@ -129,10 +131,10 @@ void consume_item(int item, int id) {
 	down(&mutex_AD);
 	average_degree = (average_degree*ad_count + temp)/(ad_count+1);
 	ad_count++;
-	debug("O grau medio eh: %g - %d iterações\n", average_degree,ad_count);
+	//debug("O grau medio eh: %g - %d iterações\n", average_degree,ad_count);
 	up(&mutex_AD);
 
-	debugtxt("Calculando o clustering coefficient...");
+	//debugtxt("Calculando o clustering coefficient...");
 	auxsum=0;
 	int viz[N_VERT];
 	int vizLen=0;
@@ -163,17 +165,17 @@ void consume_item(int item, int id) {
 	down(&mutex_CC);
 	clustering_coefficient = (clustering_coefficient*cc_count + temp)/(cc_count+1);
 	cc_count++;
-	debug("O coeficiente de agrupamento eh: %g - %d iterações\n", clustering_coefficient,cc_count);
+	//debug("O coeficiente de agrupamento eh: %g - %d iterações\n", clustering_coefficient,cc_count);
 	up(&mutex_CC);
 	last_consumed_item = item;
-	debug("Consumido o grafo #%d",item);
+	//debug("Consumido o grafo #%d",item);
 }
 
 void* producerFunc() {
 	debugtxt("Iniciando produtor de grafos");
 	int item;
 	int **mat;
-	while(TRUE) {
+	while(item <= LAST_GRAPH) {
 		down(&empty);
 		down(&mutex);
 		//A produção do grafo é feita diretamente no buffer
@@ -190,7 +192,7 @@ void* consumerFunc(int id) {
 	debugtxt("Iniciando consumidor de grafos");
 	int item;
 	int cons_ID=id-1;
-	while(TRUE) {
+	while(item <= LAST_GRAPH-N_CONS) {
 		down(&full);
 		down(&mutex);
 		item = remove_item(cons_ID);
@@ -203,7 +205,7 @@ void* consumerFunc(int id) {
 }
 
 int main() {
-
+	clock_t start = clock();
 	last_produced_item = 0;
 	start = 0;
 	end = 0;
@@ -246,11 +248,15 @@ int main() {
    	for(i=0;i<N_PROD+N_CONS;i++) {
 	    pthread_join(threadId[i], &status);
 	}
+	clock_t end = clock();
+	float seconds = (float) (end-start)/CLOCKS_PER_SEC;
+	printf("Programa com %d threads produtoras e %d threads consumidoras, com %d posições no buffer, calculou %d redes em %g segundos\n",N_PROD,N_CONS,N,LAST_GRAPH,seconds);
     sem_destroy(&mutex);
     sem_destroy(&mutex_AD);
     sem_destroy(&mutex_CC);
     sem_destroy(&full);
     sem_destroy(&empty);
     pthread_exit(NULL);
+
 	
 }

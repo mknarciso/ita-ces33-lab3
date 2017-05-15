@@ -1,0 +1,109 @@
+TID 140707378771712: "Consumido o grafo #64"
+TID 140707403949824: "Grafo completo #65"
+TID 140707403949824: "Inserindo grafo no buffer #65"
+TID 140707403949824: "Grafo inserido!"
+TID 140707387164416: "Removendo grafo do buffer para consumo."
+TID 140707387164416: "Removido grafo #65"
+TID 140707403949824: "Produzindo grafo (n=2000 , q=0.0006) ..."
+TID 140707387164416: "Calculando o grau medio..."
+TID 140707387164416: "O grau medio eh: 1.19297 - 65 iterações\n"
+TID 140707387164416: "Calculando o clustering coefficient..."
+TID 140707387164416: "O coeficiente de agrupamento eh: 0.000102692 - 65 iterações\n"
+TID 140707387164416: "Consumido o grafo #65"
+TID 140707403949824: "Grafo completo #66"
+TID 140707403949824: "Inserindo grafo no buffer #66"
+TID 140707403949824: "Grafo inserido!"
+TID 140707395557120: "Removendo grafo do buffer para consumo."
+TID 140707395557120: "Removido grafo #66"
+TID 140707403949824: "Produzindo grafo (n=2000 , q=0.0006) ..."
+TID 140707395557120: "Calculando o grau medio..."
+TID 140707395557120: "O grau medio eh: 1.19348 - 66 iterações\n"
+TID 140707395557120: "Calculando o clustering coefficient..."
+TID 140707395557120: "O coeficiente de agrupamento eh: 0.000101136 - 66 iterações\n"
+TID 140707395557120: "Consumido o grafo #66"
+TID 140707403949824: "Grafo completo #67"
+TID 140707403949824: "Inserindo grafo no buffer #67"
+TID 140707403949824: "Grafo inserido!"
+TID 140707378771712: "Removendo grafo do buffer para consumo."
+TID 140707378771712: "Removido grafo #67"
+TID 140707403949824: "Produzindo grafo (n=2000 , q=0.0006) ..."
+TID 140707378771712: "Calculando o grau medio..."
+TID 140707378771712: "O grau medio eh: 1.19327 - 67 iterações\n"
+TID 140707378771712: "Calculando o clustering coefficient..."
+TID 140707378771712: "O coeficiente de agrupamento eh: 9.96269e-05 - 67 iterações\n"
+
+
+
+
+
+
+
+
+
+TID 140598558746368: "Consumido o grafo #99"
+TID 140598558746368: "Finalizando consumidor"
+TID 140598567139072: "Grafo completo #100"
+TID 140598567139072: "Inserindo grafo no buffer #100"
+TID 140598567139072: "Grafo inserido!"
+TID 140598541960960: "Removendo grafo do buffer para consumo."
+TID 140598541960960: "Removido grafo #100"
+TID 140598567139072: "Produzindo grafo (n=2000 , q=0.0006) ..."
+TID 140598541960960: "Calculando o grau medio..."
+TID 140598541960960: "O grau medio eh: 1.19863 - 100 iterações\n"
+TID 140598541960960: "Calculando o clustering coefficient..."
+TID 140598541960960: "O coeficiente de agrupamento eh: 9.16667e-05 - 100 iterações\n"
+TID 140598541960960: "Consumido o grafo #100"
+TID 140598541960960: "Finalizando consumidor"
+TID 140598567139072: "Grafo completo #101"
+TID 140598567139072: "Inserindo grafo no buffer #101"
+TID 140598567139072: "Grafo inserido!"
+TID 140598567139072: "Finalizando produtor"
+Programa com 1 threads produtoras e 3 threads consumidoras, com 7 posições no buffer, calculou 100 redes em 11.3729 segundos
+
+
+
+TID 139739993609984: "Grafo completo #100"
+TID 139739993609984: "Inserindo grafo no buffer #100"
+TID 139739993609984: "Grafo inserido!"
+TID 139739985217280: "Removendo grafo do buffer para consumo."
+TID 139739985217280: "Removido grafo #100"
+TID 139739993609984: "Produzindo grafo (n=2000 , q=0.0006) ..."
+TID 139739985217280: "Calculando o grau medio..."
+TID 139739985217280: "O grau medio eh: 1.19863 - 100 iterações\n"
+TID 139739985217280: "Calculando o clustering coefficient..."
+TID 139739985217280: "O coeficiente de agrupamento eh: 9.16667e-05 - 100 iterações\n"
+TID 139739985217280: "Consumido o grafo #100"
+TID 139739985217280: "Finalizando consumidor"
+TID 139739993609984: "Grafo completo #101"
+TID 139739993609984: "Inserindo grafo no buffer #101"
+TID 139739993609984: "Grafo inserido!"
+TID 139739993609984: "Finalizando produtor"
+Programa com 1 threads produtoras e 1 threads consumidoras, com 1 posições no buffer, calculou 100 redes em 11.6507 segundos
+
+
+TID 140045234345728: "Iniciando consumidor de grafos"
+TID 140045242738432: "Iniciando produtor de grafos"
+TID 140045234345728: "Finalizando consumidor"
+TID 140045242738432: "Finalizando produtor"
+Programa com 1 threads produtoras e 1 threads consumidoras, com 1 posições no buffer, calculou 100 redes em 10.8496 segundos
+
+TID 140383889164032: "Iniciando consumidor de grafos"
+TID 140383897556736: "Iniciando consumidor de grafos"
+TID 140383905949440: "Iniciando consumidor de grafos"
+TID 140383914342144: "Iniciando produtor de grafos"
+TID 140383889164032: "Finalizando consumidor"
+TID 140383897556736: "Finalizando consumidor"
+TID 140383905949440: "Finalizando consumidor"
+TID 140383914342144: "Finalizando produtor"
+Programa com 1 threads produtoras e 3 threads consumidoras, com 7 posições no buffer, calculou 300 redes em 31.765 segundos
+
+TID 139984268289792: "Iniciando consumidor de grafos"
+TID 139984276682496: "Iniciando produtor de grafos"
+TID 139984268289792: "Finalizando consumidor"
+TID 139984276682496: "Finalizando produtor"
+Programa com 1 threads produtoras e 1 threads consumidoras, com 1 posições no buffer, calculou 300 redes em 33.4557 segundos
+
+
+
+
+
